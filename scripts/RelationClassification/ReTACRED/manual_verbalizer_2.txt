@@ -1,0 +1,12 @@
+date
+state
+entity
+city
+person
+religion
+organization
+event
+number
+website
+title
+country
