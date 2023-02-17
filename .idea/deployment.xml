@@ -6,28 +6,7 @@
       <paths name="luyy@frp.gooalgene.com:20024">
         <serverdata>
           <mappings>
-            <mapping deploy="/home/luyy/projects/OpenPrompt" local="$PROJECT_DIR$" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="lyy@43.153.195.41:8091">
-        <serverdata>
-          <mappings>
-            <mapping local="$PROJECT_DIR$" web="/" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="root@124.220.22.177:22 key">
-        <serverdata>
-          <mappings>
-            <mapping local="$PROJECT_DIR$" web="/" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="sshConfig://root@124.220.22.177:22 key/usr/bin/python (1)">
-        <serverdata>
-          <mappings>
-            <mapping local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="/projects/OpenPrompt" local="$PROJECT_DIR$" />
           </mappings>
         </serverdata>
       </paths>

@@ -266,6 +266,9 @@ class PromptForClassification(nn.Module):
         (``batch_size``, ``num_mask_token``, ``vocab_size``)
         or into logits of shape (if ``num_mask_token`` = 1)
         (``batch_size``, ``vocab_size``).
+        获取所有<mask>标记的输出例如，
+        将logits的维度（``batch_size``，``max_seq_length``，` `vocb_size```）投影到（如果num_mask_token>1）（``batch_size`'，``num_mask_token`，`` vocb_size ``）
+        或投影到形状（如果``num-mask_token ``=1）的logits(``batch_size``, ``vocab_size``)中
 
         Args:
             outputs (:obj:`torch.Tensor`): The original outputs (maybe process by verbalizer's

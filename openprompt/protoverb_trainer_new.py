@@ -30,7 +30,7 @@ from transformers.optimization import  Adafactor, AdafactorSchedule
 
 
 
-class ProtoVerbClassificationRunner(BaseRunner):
+class ProtoVerbClassificationRunner_New(BaseRunner):
     r"""A runner for prototypical verbalizer
     This class is specially implemented for classification.
 
@@ -159,9 +159,8 @@ class ProtoVerbClassificationRunner(BaseRunner):
                 self.inner_model.verbalizer.train_proto(self.model, self.train_dataloader, self.config.environment.local_rank)
 
         if self.config.train.train_verblizer == "post":
-            self.inner_model.verbalizer.train_proto(self.model, self.train_dataloader, self.config.environment.local_rank)
-            # self.inner_model.verbalizers[0].train_proto(self.model, self.train_dataloader, self.config.environment.local_rank)
-            # self.inner_model.verbalizers[4].train_proto(self.model, self.train_dataloader,
-            #                                             self.config.environment.local_rank)
+            self.inner_model.verbalizers[0].train_proto(self.model, self.train_dataloader, self.config.environment.local_rank)
+            self.inner_model.verbalizers[4].train_proto(self.model, self.train_dataloader,
+                                                        self.config.environment.local_rank)
 
         return self.best_score

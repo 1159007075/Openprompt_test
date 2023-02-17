@@ -140,7 +140,7 @@ class ManualVerbalizer(Verbalizer):
         Returns:
             (:obj:`torch.Tensor`): The final processed logits over the labels (classes).
         """
-        # project
+        # 将单词表的logits投影到标签词的logits中
         label_words_logits = self.project(logits, **kwargs)  #Output: (batch_size, num_classes) or  (batch_size, num_classes, num_label_words_per_label)
 
 
@@ -162,7 +162,7 @@ class ManualVerbalizer(Verbalizer):
     def normalize(self, logits: torch.Tensor) -> torch.Tensor:
         """
         Given logits regarding the entire vocabulary, return the probs over the label words set.
-
+        给定关于整个词汇表的logits，返回标签词集的问题
         Args:
             logits (:obj:`Tensor`): The logits over the entire vocabulary.
 

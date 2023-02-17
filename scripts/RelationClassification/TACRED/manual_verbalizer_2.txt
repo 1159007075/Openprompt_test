@@ -1,5 +1,12 @@
-politics
-sports
-business
-technology
-
+date
+state
+entity
+city
+person
+religion
+organization
+event
+number
+website
+title
+country

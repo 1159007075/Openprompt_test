@@ -40,5 +40,5 @@
     "per:origin": ["person", "<!>'s", "nationality", "was", "country"],
     "org:website": ["organization", "<!>'s", "website", "was", "url"],
     "per:age": ["person", "<!>'s", "age", "was", "number"],
-    "no_relation": ["entity", "is", "irrelevant", "to", "entity"]
+    "NA": ["entity", "is", "irrelevant", "to", "entity"]
 }

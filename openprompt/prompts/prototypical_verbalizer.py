@@ -123,6 +123,7 @@ class ProtoVerbalizer(Verbalizer):
 
         max_len  = max([max([len(ids) for ids in ids_per_label]) for ids_per_label in all_ids])
         max_num_label_words = max([len(ids_per_label) for ids_per_label in all_ids])
+        # 初始化words_ids_mask
         words_ids_mask = torch.zeros(max_num_label_words, max_len)
         words_ids_mask = [[[1]*len(ids) + [0]*(max_len-len(ids)) for ids in ids_per_label]
                              + [[0]*max_len]*(max_num_label_words-len(ids_per_label))
@@ -133,6 +134,7 @@ class ProtoVerbalizer(Verbalizer):
 
         words_ids_tensor = torch.tensor(words_ids)
         words_ids_mask = torch.tensor(words_ids_mask)
+        # 从tensor转化为可训练的参数
         self.label_words_ids = nn.Parameter(words_ids_tensor, requires_grad=False)
         self.words_ids_mask = nn.Parameter(words_ids_mask, requires_grad=False) # A 3-d mask
         self.label_words_mask = nn.Parameter(torch.clamp(words_ids_mask.sum(dim=-1), max=1), requires_grad=False)
@@ -150,7 +152,9 @@ class ProtoVerbalizer(Verbalizer):
                 ) -> torch.Tensor:
         r"""
         Project the labels, the return value is the normalized (sum to 1) probs of label words.
-        对标签进行投影，返回值为标签单词的标准化探测值(和为1)。
+        对标签进行处理，返回值为标签词的标准化探测值(和为1)。
+        将模型预测的logits投影到标签词
+        Output: (batch_size, num_classes) or  (batch_size, num_classes, num_label_words_per_label)
 
         Args:
             logits (:obj:`torch.Tensor`): The original logits of label words.
@@ -159,9 +163,10 @@ class ProtoVerbalizer(Verbalizer):
             :obj:`torch.Tensor`: The normalized logits of label words
         """
 
-        label_words_logits = logits[:, self.label_words_ids]
-        label_words_logits = self.handle_multi_token(label_words_logits, self.words_ids_mask)
-        label_words_logits -= 10000*(1-self.label_words_mask)
+        label_words_logits = logits[:, self.label_words_ids]    # 2,5,50265 logits：（``batch_size`'，``num_mask_token`，`` vocb_size ``）
+        label_words_logits = self.handle_multi_token(label_words_logits, self.words_ids_mask) # 2,42,1,12,50265
+        temp=10000*(1-self.label_words_mask) # output:()
+        label_words_logits -= temp # 2,42,1,12
         return label_words_logits
 
     def process_logits(self, logits: torch.Tensor, **kwargs):
@@ -299,6 +304,7 @@ class ProtoVerbalizer(Verbalizer):
 
     def pcl_loss(self, v_ins):
         # instance-prototype loss
+        # 实例-原型损失
 
         sim_mat = torch.exp(self.sim(v_ins, self.proto))
         num = sim_mat.shape[1]
@@ -310,6 +316,7 @@ class ProtoVerbalizer(Verbalizer):
         loss = loss / (num * self.num_classes * self.num_classes)
 
         # instance-instance loss
+        # 原型-原型
 
         loss_ins = 0.
         for i in range(v_ins.shape[0]):
@@ -336,9 +343,9 @@ class ProtoVerbalizer(Verbalizer):
                     label = batch['label'][j]
                     embeds[label].append(outputs_at_mask[j])
         embeds = [torch.stack(e) for e in embeds]
-        embeds = torch.stack(embeds)
+        embeds = torch.stack(embeds)  # [4,8,1024]---[class_num,example_pre_class]
 
-        instance_mean = embeds.mean(1)
+        instance_mean = embeds.mean(1)  # [4,1024]平均
         loss = 0.
         for epoch in range(self.epochs):
             x = self.head(embeds)

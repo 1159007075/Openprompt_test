@@ -1,5 +1,3 @@
-politics
-sports
-business
-technology
-
+organization
+entity
+person

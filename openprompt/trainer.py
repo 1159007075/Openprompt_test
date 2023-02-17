@@ -58,7 +58,7 @@ class BaseRunner(object):
         self.train_dataloader = train_dataloader
         self.valid_dataloader = valid_dataloader
         self.test_dataloader = test_dataloader
-
+        #送入训练设备
         self.wrap_model()
 
         self.cur_epoch = 0
@@ -79,7 +79,7 @@ class BaseRunner(object):
         self.writer.add_scalar(name, y, x)
 
     def set_stop_criterion(self):
-        """Total training steps, either controlled by num_training_steps or num_epochs"""
+        """总训练步骤，由 num_training_step 或 num_epochs 控制"""
         if hasattr(self.config.train, "num_training_steps") and self.config.train.num_training_steps is not None:
             if self.config.train.num_epochs is not None:
                 logger.warning("num_training_steps set explicitly, num_epochs is not in use.")
@@ -93,16 +93,18 @@ class BaseRunner(object):
 
     @property
     def steps_per_epoch(self) -> int:
-        """num of training steps per epoch"""
+        """每个epoch的训练步骤数"""
         batches = len(self.train_dataloader)
         effective_accum = self.config.train.gradient_accumulation_steps
         return (batches // effective_accum)
 
     def wrap_model(self):
+        """将模型送入训练设备"""
         self.model = model_to_device(self.model, self.config.environment)
 
     @property
     def inner_model(self):
+        """内部模型"""
         return self.model.module if isinstance(self.model, DataParallel) else self.model
 
     def configure_optimizers(self):
@@ -326,7 +328,6 @@ class BaseRunner(object):
     def fit(self, ckpt: Optional[str] = None):
         self.set_stop_criterion()
         self.configure_optimizers()
-
 
         if ckpt:
             if not self.load_checkpoint(ckpt):

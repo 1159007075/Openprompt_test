@@ -17,6 +17,8 @@ class One2oneVerbalizer(Verbalizer):
     The basic manually defined verbalizer class, this class is inherited from the :obj:`Verbalizer` class.
     This class restrict the use of label words to one words per label. For a verbalzer with less constraints,
     please use Basic ManualVerbalizer.
+    基本的手动定义的描述器类，该类继承自：obj:`verbalizer`类。
+    此类将标签单词的使用限制为每个标签一个单词。对于约束较少的verbalizer，请使用基本手册描述器
 
     Args:
         tokenizer (:obj:`PreTrainedTokenizer`): The tokenizer of the current pre-trained model to point out the vocabulary.

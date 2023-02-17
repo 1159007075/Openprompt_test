@@ -1,13 +1,13 @@
-# In this scripts, you will learn
-# 1. how to use integrate huggingface datasets utilities into openprompt to
-#  enable prompt learning in diverse datasets.
-# 2. How to instantiate a template using a template language
-# 3. How does the template wrap the input example into a templated one.
-# 4. How do we hide the PLM tokenization details behind and provide a simple tokenization
-# 5. How do construct a verbalizer using one/many label words
-# 5. How to train the prompt like a traditional Pretrained Model.
+#在本脚本中，您将学习
+#1.如何将huggingface数据集实用程序集成到openprompt中，以在不同的数据集中实现快速学习
+#2.如何使用模板语言
+#3.实例化模板。模板如何将输入示例包装为模板示例
+#4.我们如何隐藏PLM tokenization细节，并提供一个简单的tokenization
+#5.如何使用一个或者多个标签词
+#6.构造描述器。如何像传统的预训练模型一样训练提示。
 
 device_ids=[2,3]
+
 # load dataset
 from datasets import load_dataset
 raw_dataset = load_dataset('super_glue', 'cb')
@@ -35,23 +35,22 @@ from openprompt.plms import load_plm
 plm, tokenizer, model_config, WrapperClass = load_plm("t5", "t5-base")
 
 # Constructing Template
-# A template can be constructed from the yaml config, but it can also be constructed by directly passing arguments.
+# 可以从 yaml 配置构造模板，但也可以通过直接传递参数构造模板
 from openprompt.prompts import ManualTemplate
 template_text = '{"placeholder":"text_a"} Question: {"placeholder":"text_b"}? Is it correct? {"mask"}.'
 mytemplate = ManualTemplate(tokenizer=tokenizer, text=template_text)
 
-# To better understand how does the template wrap the example, we visualize one instance.
+#为了更好地理解模板如何包装示例，我们将一个实例可视化
 
 wrapped_example = mytemplate.wrap_one_example(dataset['train'][0])
 print(wrapped_example)
 
 
-# Now, the wrapped example is ready to be pass into the tokenizer, hence producing the input for language models.
-# You can use the tokenizer to tokenize the input by yourself, but we recommend using our wrapped tokenizer, which is a wrapped tokenizer tailed for InputExample.
-# The wrapper has been given if you use our `load_plm` function, otherwise, you should choose the suitable wrapper based on
-# the configuration in `openprompt.plms.__init__.py`.
-# Note that when t5 is used for classification, we only need to pass <pad> <extra_id_0> <eos> to decoder.
-# The loss is calcaluted at <extra_id_0>. Thus passing decoder_max_length=3 saves the space
+# 现在，包装好的示例已准备好传递给标记器，从而生成语言模型的输入。
+# 您可以使用标记器自己标记输入，但我们建议使用包装标记器，它是InputExample的包装标记器尾部。
+# 如果您使用“load_plm”函数，则已给出包装器，否则，应根据配置选择合适的包装器in `openprompt.plms.__init__.py`.
+# 注意，当 t5用于分类时，我们只需要传递 < pad > < tra _ id _ 0 > < eos > 来解码。
+# 损失计算为<extra_id_0>。因此，通过decoder_max_length=3节省了空间
 wrapped_t5tokenizer = WrapperClass(max_seq_length=128, decoder_max_length=3, tokenizer=tokenizer,truncate_method="head")
 # or
 from openprompt.plms import T5TokenizerWrapper
@@ -74,7 +73,7 @@ for split in ['train', 'validation', 'test']:
         model_inputs[split].append(tokenized_example)
 
 
-# We provide a `PromptDataLoader` class to help you do all the above matters and wrap them into an `torch.DataLoader` style iterator.
+# 我们提供了一个“PromptDataLoader”类来帮助您完成上述所有事项，并将它们包装成一个“torch.DataLoader风格的迭代器”
 from openprompt import PromptDataLoader
 
 train_dataloader = PromptDataLoader(dataset=dataset["train"], template=mytemplate, tokenizer=tokenizer,
@@ -85,23 +84,21 @@ train_dataloader = PromptDataLoader(dataset=dataset["train"], template=mytemplat
 
 
 # Define the verbalizer
-# In classification, you need to define your verbalizer, which is a mapping from logits on the vocabulary to the final label probability. Let's have a look at the verbalizer details:
+# 在分类中，您需要定义描述器，它是从词汇表上的逻辑到最终标签概率的映射。让我们来看看描述器的详细信息：
 
 from openprompt.prompts import ManualVerbalizer
 import torch
 
-# for example the verbalizer contains multiple label words in each class
+# 例如，描述器在每个类中包含多个标签词
 myverbalizer = ManualVerbalizer(tokenizer, num_classes=3,
-                        label_words=[["yes"], ["no"], ["maybe"]])
+                        label_words=[["yes","sure"], ["no","not"], ["maybe","probably","perhaps"]])
 
 print(myverbalizer.label_words_ids)
-logits = torch.randn(2,len(tokenizer)) # creating a pseudo output from the plm, and
-print(myverbalizer.process_logits(logits)) # see what the verbalizer do
+logits = torch.randn(2,len(tokenizer)) # 从plm创造一个伪输出看哪个verbalizer起作用
+print("process_logits:",myverbalizer.process_logits(logits))
 
 
-# Although you can manually combine the plm, template, verbalizer together, we provide a pipeline
-# model which take the batched data from the PromptDataLoader and produce a class-wise logits
-
+# 尽管您可以手动将plm、模板和描述器组合在一起，但我们提供了一个管道模型，它从PromptDataLoader中获取批处理数据并生成类逻辑
 from openprompt import PromptForClassification
 
 use_cuda = True

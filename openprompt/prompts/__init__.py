@@ -22,6 +22,7 @@ from .prompt_generator import T5TemplateGenerator, TemplateGenerator, Verbalizer
 from .generation_verbalizer import GenerationVerbalizer
 from .soft_verbalizer import SoftVerbalizer
 from .prototypical_verbalizer import ProtoVerbalizer
+from .ptr_prompts_new import PTRVerbalizer_New
 
 TEMPLATE_CLASS = {
     'manual_template': ManualTemplate,
@@ -41,6 +42,7 @@ VERBALIZER_CLASS = {
     'generation_verbalizer': GenerationVerbalizer,
     'soft_verbalizer': SoftVerbalizer,
     'proto_verbalizer': ProtoVerbalizer,
+    'ptr_verbalizer_new': PTRVerbalizer_New,
 }
 
 TEMPLATE_GENERATOR_CLASS = {
@@ -88,8 +90,9 @@ def load_verbalizer(config: CfgNode,
     """
     if config.verbalizer is not None:
         verbalizer_class = VERBALIZER_CLASS[config.verbalizer]
-        verbalizer = verbalizer_class.from_config(config=config[config.verbalizer],
-                                     **kwargs)
+        # verbalizer = verbalizer_class.from_config(config=config[config.verbalizer],proto_verbalizer1=config[config.verbalizer1],
+        #                                 proto_verbalizer2=config[config.verbalizer2],**kwargs)
+        verbalizer = verbalizer_class.from_config(config=config[config.verbalizer],**kwargs)
     return verbalizer
 
 def load_template_generator(config: CfgNode, **kwargs,):

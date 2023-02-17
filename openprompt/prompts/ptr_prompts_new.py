@@ -36,7 +36,7 @@ class PTRTemplate(PtuningTemplate):
                          placeholder_mapping=placeholder_mapping)
 
 
-class PTRVerbalizer(Verbalizer):
+class PTRVerbalizer_New(Verbalizer):
     """
     In `PTR <https://arxiv.org/pdf/2105.11259.pdf>`_, each prompt has more than one ``<mask>`` tokens.
     Different ``<mask>`` tokens have different label words.

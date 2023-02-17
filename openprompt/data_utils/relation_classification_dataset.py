@@ -50,25 +50,42 @@ class TACREDProcessor(DataProcessor):
 
     def __init__(self):
         super().__init__(labels = [
-            "no_relation", "org:founded", "org:subsidiaries", "per:date_of_birth", "per:cause_of_death", "per:age", "per:stateorprovince_of_birth", "per:countries_of_residence", "per:country_of_birth", "per:stateorprovinces_of_residence", "org:website", "per:cities_of_residence", "per:parents", "per:employee_of", "per:city_of_birth", "org:parents", "org:political/religious_affiliation", "per:schools_attended", "per:country_of_death", "per:children", "org:top_members/employees", "per:date_of_death", "org:members", "org:alternate_names", "per:religion", "org:member_of", "org:city_of_headquarters", "per:origin", "org:shareholders", "per:charges", "per:title", "org:number_of_employees/members", "org:dissolved", "org:country_of_headquarters", "per:alternate_names", "per:siblings", "org:stateorprovince_of_headquarters", "per:spouse", "per:other_family", "per:city_of_death", "per:stateorprovince_of_death", "org:founded_by"
+            "NA", "org:founded", "org:subsidiaries", "per:date_of_birth", "per:cause_of_death", "per:age", "per:stateorprovince_of_birth", "per:countries_of_residence", "per:country_of_birth", "per:stateorprovinces_of_residence", "org:website", "per:cities_of_residence", "per:parents", "per:employee_of", "per:city_of_birth", "org:parents", "org:political/religious_affiliation", "per:schools_attended", "per:country_of_death", "per:children", "org:top_members/employees", "per:date_of_death", "org:members", "org:alternate_names", "per:religion", "org:member_of", "org:city_of_headquarters", "per:origin", "org:shareholders", "per:charges", "per:title", "org:number_of_employees/members", "org:dissolved", "org:country_of_headquarters", "per:alternate_names", "per:siblings", "org:stateorprovince_of_headquarters", "per:spouse", "per:other_family", "per:city_of_death", "per:stateorprovince_of_death", "org:founded_by"
         ])
 
+    # def get_examples(self, data_dir, split):
+    #     path = os.path.join(data_dir, "{}.json".format(split))
+    #     examples = []
+    #     with open(path, encoding='utf8') as f:
+    #         example_jsons = json.load(f)
+    #         for example_json in example_jsons:
+    #             guid = example_json["id"]
+    #             label = self.get_label_id(example_json["relation"])
+    #             tokens = example_json["token"]
+    #             text_a = " ".join(tokens)
+    #             meta = {
+    #                 "head": " ".join(tokens[example_json["subj_start"]: example_json["subj_end"]+1]),
+    #                 "tail": " ".join(tokens[example_json["obj_start"]: example_json["obj_end"]+1]),
+    #             }
+    #
+    #             example = InputExample(guid=guid, text_a=text_a, meta=meta, label=label)
+    #             examples.append(example)
+    #     return examples
     def get_examples(self, data_dir, split):
         path = os.path.join(data_dir, "{}.json".format(split))
         examples = []
         with open(path, encoding='utf8') as f:
             example_jsons = json.load(f)
             for example_json in example_jsons:
-                guid = example_json["id"]
-                label = self.get_label_id(example_json["relation"])
-                tokens = example_json["token"]
-                text_a = " ".join(tokens)
+                # guid = example_json["id"]
+                label = self.get_label_id(example_json["label"])
+                text_a=example_json["text"]
                 meta = {
-                    "head": " ".join(tokens[example_json["subj_start"]: example_json["subj_end"]+1]),
-                    "tail": " ".join(tokens[example_json["obj_start"]: example_json["obj_end"]+1]),
+                    "head": example_json["ents"][0][0],
+                    "tail": example_json["ents"][1][0],
                 }
 
-                example = InputExample(guid=guid, text_a=text_a, meta=meta, label=label)
+                example = InputExample(text_a=text_a, meta=meta, label=label)
                 examples.append(example)
         return examples
 

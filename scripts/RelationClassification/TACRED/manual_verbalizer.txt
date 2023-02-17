@@ -39,4 +39,4 @@ per:other_family
 per:city_of_death
 per:stateorprovince_of_death
 org:founded_by
-no_relation
+NA

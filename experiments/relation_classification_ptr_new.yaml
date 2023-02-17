@@ -12,20 +12,21 @@ plm:
     weight_decay: 0.01
     adam_epsilon: 1.0E-6
     scheduler:
-      type: 
+      type:
       num_warmup_steps: 500
 
 reproduce:
-  seed: 42
+  seed: 123
 
 dataloader:
   max_seq_length: 512
 
 train:
-  batch_size: 1
-  num_epochs: 5
+  batch_size: 4
+  num_epochs: 1
   gradient_accumulation_steps: 1
   max_grad_norm: 1.0
+  train_verblizer: post
 
 test:
   batch_size: 8
@@ -36,7 +37,9 @@ dev:
 
 
 template: ptr_template
-verbalizer: proto_verbalizer
+verbalizer: ptr_verbalizer_new
+verbalizer1: proto_verbalizer1
+verbalizer2: proto_verbalizer2
 
 
 ptr_template:
@@ -47,24 +50,16 @@ ptr_template:
     adam_epsilon: 1.0e-8
     lr: 0.00001
 
-#ptr_verbalizer:
-#  choice: 0
-#  file_path: ../scripts/RelationClassification/TACRED/ptr_verbalizer.jsonl
-
-proto_verbalizer:
-  parent_config: verbalizer
+ptr_verbalizer_new:
   choice: 0
-  file_path: ../scripts/RelationClassification/TACRED/manual_verbalizer.txt
-  lr: 0.01
-  mid_dim: 64
-  epochs: 30
-  multi_verb: multi
-  
+  file_path: ../scripts/RelationClassification/TACRED/ptr_verbalizer.jsonl
+
 environment:
-  num_gpus: 1
+  num_gpus: 2
   cuda_visible_devices:
-    - 1
-  local_rank: 0 
+    - 2
+    - 3
+  local_rank: 0
 
 classification:
   loss_function: nll_loss
@@ -74,11 +69,29 @@ learning_setting: few_shot
 few_shot:
   parent_config: learning_setting
   few_shot_sampling: sampling_from_train
-  
+
 sampling_from_train:
   parent_config: few_shot_sampling
-  num_examples_per_label: 32
+  num_examples_per_label: 8
   also_sample_dev: True
-  num_examples_per_label_dev: 32
+  num_examples_per_label_dev: 8
   seed:
     - 123
+#  新
+proto_verbalizer1:
+  parent_config: verbalizer
+  choice: 0
+  file_path: ../scripts/RelationClassification/TACRED/manual_verbalizer_1.txt
+  lr: 0.01
+  mid_dim: 64
+  epochs: 50
+  multi_verb: proto
+
+proto_verbalizer2:
+  parent_config: verbalizer
+  choice: 0
+  file_path: ../scripts/RelationClassification/TACRED/manual_verbalizer_2.txt
+  lr: 0.01
+  mid_dim: 64
+  epochs: 50
+  multi_verb: proto

@@ -1,5 +1,8 @@
 import os
 import sys
+
+from openprompt.protoverb_trainer_new import ProtoVerbClassificationRunner_New
+
 sys.path.append(".")
 
 import argparse
@@ -56,7 +59,6 @@ def main():
 
     # load dataset. The valid_dataset can be None
     # 加载数据集
-    print("参数.test=",args.test)
     train_dataset, valid_dataset, test_dataset, Processor = load_dataset(config, test = args.test is not None or config.learning_setting == 'zero_shot')
 
     # main
@@ -171,6 +173,14 @@ def trainer(EXP_PATH, config, Processor, train_dataset = None, valid_dataset = N
                                     id2label = Processor.id2label,
                                     config = config
             )
+        elif config.verbalizer=="ptr_verbalizer_new":
+            runner = ProtoVerbClassificationRunner_New(model=prompt_model,
+                                                   train_dataloader=train_dataloader,
+                                                   valid_dataloader=valid_dataloader,
+                                                   test_dataloader=test_dataloader,
+                                                   id2label=Processor.id2label,
+                                                   config=config
+                                                   )
         else:
             runner = ClassificationRunner(model = prompt_model,
                                     train_dataloader = train_dataloader,
