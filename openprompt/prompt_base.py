@@ -1,6 +1,6 @@
 from abc import abstractmethod
 import json
-
+from transformers.modeling_outputs import CausalLMOutputWithCrossAttentions, Seq2SeqLMOutput, MaskedLMOutput
 from transformers.file_utils import ModelOutput
 from openprompt.config import convert_cfg_to_dict
 
@@ -488,17 +488,18 @@ class Verbalizer(nn.Module):
         return self.process_logits(outputs, batch=batch, **kwargs)
 
     def gather_outputs(self, outputs: ModelOutput):
-        r""" retrieve useful output for the verbalizer from the whole model output
-        By default, it will only retrieve the logits
+        logits = outputs.logits
+        if isinstance(outputs, Seq2SeqLMOutput):
+            ret = outputs.decoder_hidden_states[-1]
+        elif isinstance(outputs, MaskedLMOutput) or isinstance(outputs, CausalLMOutputWithCrossAttentions):
+            ret = outputs.hidden_states[-1]
+        else:
+            try:
+                ret = outputs.hidden_states[-1]
+            except AttributeError:
+                raise NotImplementedError(f"Gather outputs method for outputs' type {type(outputs)} not implemented")
 
-        Args:
-            outputs (:obj:`ModelOutput`) The output from the pretrained language model.
-
-        Return:
-            :obj:`torch.Tensor` The gathered output, should be of shape (``batch_size``,
-            ``seq_len``, ``any``)
-        """
-        return outputs.logits
+        return ret, logits
 
     @staticmethod
     def aggregate(label_words_logits: torch.Tensor) -> torch.Tensor:

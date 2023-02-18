@@ -296,7 +296,8 @@ class PromptForClassification(nn.Module):
             :obj:`torch.Tensor`: The logits of the label words (obtained by the current verbalizer).
         """
         outputs = self.prompt_model(batch)
-        outputs = self.verbalizer.gather_outputs(outputs)
+        hidden,outputs = self.verbalizer.gather_outputs(outputs)
+        outputs_at_mask = self.extract_at_mask(hidden, batch)
         if isinstance(outputs, tuple):
             outputs_at_mask = [self.extract_at_mask(output, batch) for output in outputs]
         else:

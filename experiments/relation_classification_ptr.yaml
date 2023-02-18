@@ -38,8 +38,6 @@ dev:
 
 template: ptr_template
 verbalizer: ptr_verbalizer
-verbalizer1: proto_verbalizer1
-verbalizer2: proto_verbalizer2
 
 
 ptr_template:
@@ -72,9 +70,9 @@ few_shot:
   
 sampling_from_train:
   parent_config: few_shot_sampling
-  num_examples_per_label: 32
+  num_examples_per_label: 8
   also_sample_dev: True
-  num_examples_per_label_dev: 32
+  num_examples_per_label_dev: 8
   seed:
     - 123
 

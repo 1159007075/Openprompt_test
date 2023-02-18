@@ -103,7 +103,7 @@ class One2oneVerbalizer(Verbalizer):
                 ) -> torch.Tensor:
         r"""
         Project the labels, the return value is the normalized (sum to 1) probs of label words.
-
+        对标签进行投影，返回值为标签单词的标准化探测值(和为1)
         Args:
             logits (:obj:`torch.Tensor`): The original logits of label words.
 

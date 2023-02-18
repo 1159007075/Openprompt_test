@@ -49,8 +49,6 @@ class PTRVerbalizer(Verbalizer):
         label_words (:obj:`Union[Sequence[Sequence[str]], Mapping[str, Sequence[str]]]`, optional): The label words that are projected by the labels.
     """
     def __init__(self,
-                 proto_verbalizer1,
-                 proto_verbalizer2,
                  tokenizer: PreTrainedTokenizer,
                  model: Optional[PreTrainedModel],
                  classes: Sequence[str] = None,
@@ -58,8 +56,8 @@ class PTRVerbalizer(Verbalizer):
                  label_words: Optional[Union[Sequence[Sequence[str]], Mapping[str, Sequence[str]]]] = None,
                 ):
         super().__init__(tokenizer = tokenizer, classes = classes, num_classes = num_classes)
-        self.proto_verbalizer1 = proto_verbalizer1
-        self.proto_verbalizer2 = proto_verbalizer2
+        # self.proto_verbalizer1 = proto_verbalizer1
+        # self.proto_verbalizer2 = proto_verbalizer2
         self.label_words = label_words
         self.v_model=model
 
@@ -80,21 +78,9 @@ class PTRVerbalizer(Verbalizer):
         ] # [num_masks, label_size of the corresponding mask]
 
         self.verbalizers = nn.ModuleList([
-            # One2oneVerbalizer(tokenizer=self.tokenizer, label_words=labels, post_log_softmax = False)
-            # for labels in self.sub_labels
+            One2oneVerbalizer(tokenizer=self.tokenizer, label_words=labels, post_log_softmax = False)
+            for labels in self.sub_labels
         ]) # [num_masks]
-
-        for i in range(self.num_masks):
-            # if i == 0:
-            #     self.verbalizers.append(openprompt.prompts.ProtoVerbalizer.from_config(config=self.proto_verbalizer1,tokenizer=self.tokenizer,model=self.v_model,
-            #                                                                classes=self.sub_labels[i]))
-            # elif i == self.num_masks - 1:
-            #     self.verbalizers.append(
-            #         openprompt.prompts.ProtoVerbalizer.from_config(config=self.proto_verbalizer2,
-            #                                                     tokenizer=self.tokenizer, model=self.v_model,
-            #                                                     classes=self.sub_labels[i]))
-            # else:
-                self.verbalizers.append(One2oneVerbalizer(tokenizer=self.tokenizer, label_words=self.sub_labels[i], post_log_softmax=False))
 
         self.label_mappings = nn.Parameter(torch.LongTensor([
             [labels.index(words[j]) for words in self.label_words]
@@ -107,9 +93,9 @@ class PTRVerbalizer(Verbalizer):
                        **kwargs):
         """
         1) Process vocab logits of each `<mask>` into label logits of each `<mask>`
-            将每个“＜mask＞”的vocab逻辑处理为每个“＜掩码＞”的标签逻辑
+            将每个“＜mask＞”的vocab logits处理为每个“＜掩码＞”的标签逻辑
         2) Combine these logits into a single label logits of the whole task
-            将这些逻辑合并为整个任务的单个标签逻辑
+            将这些logits合并为整个任务的单个标签逻辑
 
         Args:
             logits (:obj:`torch.Tensor`): vocab logits of each `<mask>` (shape: `[batch_size, num_masks, vocab_size]`)

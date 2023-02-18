@@ -323,6 +323,7 @@ class BaseRunner(object):
 
     def on_fit_start(self):
         """Some initialization works"""
+
         pass
 
     def fit(self, ckpt: Optional[str] = None):
