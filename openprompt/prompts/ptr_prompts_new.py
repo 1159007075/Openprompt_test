@@ -11,7 +11,7 @@ from typing import *
 from transformers import PreTrainedModel
 from transformers.tokenization_utils import PreTrainedTokenizer
 from openprompt import Verbalizer
-from openprompt.prompts import One2oneVerbalizer, PtuningTemplate
+from openprompt.prompts import One2oneVerbalizer, PtuningTemplate,ProtoVerbalizer_New
 
 
 class PTRTemplate(PtuningTemplate):
@@ -49,8 +49,6 @@ class PTRVerbalizer_New(Verbalizer):
         label_words (:obj:`Union[Sequence[Sequence[str]], Mapping[str, Sequence[str]]]`, optional): The label words that are projected by the labels.
     """
     def __init__(self,
-                 proto_verbalizer1,
-                 proto_verbalizer2,
                  tokenizer: PreTrainedTokenizer,
                  model: Optional[PreTrainedModel],
                  classes: Sequence[str] = None,
@@ -58,8 +56,6 @@ class PTRVerbalizer_New(Verbalizer):
                  label_words: Optional[Union[Sequence[Sequence[str]], Mapping[str, Sequence[str]]]] = None,
                 ):
         super().__init__(tokenizer = tokenizer, classes = classes, num_classes = num_classes)
-        self.proto_verbalizer1 = proto_verbalizer1
-        self.proto_verbalizer2 = proto_verbalizer2
         self.label_words = label_words
         self.v_model=model
 
@@ -86,14 +82,11 @@ class PTRVerbalizer_New(Verbalizer):
 
         for i in range(self.num_masks):
             if i == 0:
-                self.verbalizers.append(openprompt.prompts.ProtoVerbalizer.from_config(config=self.proto_verbalizer1,
-                                                                                       tokenizer=self.tokenizer
-                                                                                       ,model=self.v_model,num_classes=self.num_classes))
+                self.verbalizers.append(ProtoVerbalizer_New(tokenizer=self.tokenizer,model=self.v_model,num_classes=self.num_classes,
+                                                        num_mask=0))
             elif i == self.num_masks - 1:
-                self.verbalizers.append(
-                    openprompt.prompts.ProtoVerbalizer.from_config(config=self.proto_verbalizer2,
-                                                                tokenizer=self.tokenizer,
-                                                                   model=self.v_model,num_classes=self.num_classes))
+                self.verbalizers.append(ProtoVerbalizer_New(tokenizer=self.tokenizer,model=self.v_model,num_classes=self.num_classes,
+                                                        num_mask=self.num_masks-1))
             else:
                 self.verbalizers.append(One2oneVerbalizer(tokenizer=self.tokenizer, label_words=self.sub_labels[i], post_log_softmax=False))
 

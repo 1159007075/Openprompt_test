@@ -18,7 +18,7 @@ checkpoint:
   save_best: False
 
 train:
-  batch_size: 2
+  batch_size: 3
   num_epochs: 2
   train_verblizer: post
   clean: True
@@ -47,7 +47,7 @@ proto_verbalizer:
 environment:
   num_gpus: 1
   cuda_visible_devices:
-    - 3
+    - 0
   local_rank: 0
   
 learning_setting: few_shot

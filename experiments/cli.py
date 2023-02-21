@@ -21,6 +21,7 @@ from openprompt.config import get_config, save_config_to_yaml
 from openprompt.plms import load_plm_from_config
 from openprompt.data_utils import load_dataset
 from openprompt.utils.cuda import model_to_device
+import random
 
 
 
@@ -60,6 +61,7 @@ def main():
     # load dataset. The valid_dataset can be None
     # 加载数据集
     train_dataset, valid_dataset, test_dataset, Processor = load_dataset(config, test = args.test is not None or config.learning_setting == 'zero_shot')
+    test_dataset=random.sample(test_dataset,200)
 
     # main
     if config.learning_setting == 'full':

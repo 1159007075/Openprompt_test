@@ -38,8 +38,6 @@ dev:
 
 template: ptr_template
 verbalizer: ptr_verbalizer_new
-verbalizer1: proto_verbalizer1
-verbalizer2: proto_verbalizer2
 
 
 ptr_template:
@@ -55,12 +53,10 @@ ptr_verbalizer_new:
   file_path: ../scripts/RelationClassification/TACRED/ptr_verbalizer.jsonl
 
 environment:
-  num_gpus: 4
+  num_gpus: 2
   cuda_visible_devices:
     - 0
     - 1
-    - 2
-    - 3
   local_rank: 0
 
 classification:
@@ -74,26 +70,17 @@ few_shot:
 
 sampling_from_train:
   parent_config: few_shot_sampling
-  num_examples_per_label: 1
+  num_examples_per_label: 2
   also_sample_dev: True
-  num_examples_per_label_dev: 1
+  num_examples_per_label_dev: 2
   seed:
     - 123
-#  新
-proto_verbalizer1:
-  parent_config: verbalizer
-  choice: 0
-  file_path: ../scripts/RelationClassification/TACRED/manual_verbalizer_1.txt
-  lr: 0.01
-  mid_dim: 64
-  epochs: 50
-  multi_verb: proto
 
-proto_verbalizer2:
-  parent_config: verbalizer
-  choice: 0
-  file_path: ../scripts/RelationClassification/TACRED/manual_verbalizer_2.txt
-  lr: 0.01
-  mid_dim: 64
-  epochs: 50
-  multi_verb: proto
+#proto_verbalizer1:
+#  parent_config: verbalizer
+#  choice: 0
+#  file_path: ../scripts/RelationClassification/TACRED/manual_verbalizer_1.txt
+#  lr: 0.01
+#  mid_dim: 64
+#  epochs: 50
+#  multi_verb: proto
