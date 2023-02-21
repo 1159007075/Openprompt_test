@@ -4,7 +4,7 @@ dataset:
 
 plm:
   model_name: roberta
-  model_path: roberta-large
+  model_path: roberta-base
   optimize:
     name: AdamW
     freeze_para: False
@@ -55,8 +55,10 @@ ptr_verbalizer_new:
   file_path: ../scripts/RelationClassification/TACRED/ptr_verbalizer.jsonl
 
 environment:
-  num_gpus: 2
+  num_gpus: 4
   cuda_visible_devices:
+    - 0
+    - 1
     - 2
     - 3
   local_rank: 0
@@ -72,9 +74,9 @@ few_shot:
 
 sampling_from_train:
   parent_config: few_shot_sampling
-  num_examples_per_label: 8
+  num_examples_per_label: 1
   also_sample_dev: True
-  num_examples_per_label_dev: 8
+  num_examples_per_label_dev: 1
   seed:
     - 123
 #  新

@@ -46,7 +46,8 @@ class ProtoVerbalizer(Verbalizer):
                  lr: Optional[float] = 1e-3,
                  mid_dim: Optional[int] = 64,
                  epochs: Optional[int] = 5,
-                 multi_verb: Optional[str] = "multi",
+                 multi_verb: Optional[str] = "proto",
+                 num_mask: Optional[int] = 0,
                 ):
         super().__init__(tokenizer=tokenizer, num_classes=num_classes, classes=classes)
         self.prefix = prefix
@@ -57,7 +58,7 @@ class ProtoVerbalizer(Verbalizer):
         self.mid_dim = mid_dim
         self.epochs = epochs
         self.trained = False
-
+        self.num_mask=num_mask
         self.hidden_dims = model.config.hidden_size
 
         self.head = torch.nn.Linear(self.hidden_dims, self.mid_dim, bias=False)
@@ -336,12 +337,12 @@ class ProtoVerbalizer(Verbalizer):
         with torch.no_grad():
             for i, batch in enumerate(dataloader):
                 batch = batch.to("cuda:{}".format(device)).to_dict()
-                outputs = model.prompt_model(batch)
+                outputs = model.module.prompt_model(batch)
                 hidden, _ = self.gather_outputs(outputs)
-                outputs_at_mask = model.extract_at_mask(hidden, batch)
+                outputs_at_mask = model.module.extract_at_mask(hidden, batch)
                 for j in range(len(outputs_at_mask)):
                     label = batch['label'][j]
-                    embeds[label].append(outputs_at_mask[j])
+                    embeds[label].append(outputs_at_mask[j][0])
         embeds = [torch.stack(e) for e in embeds]
         embeds = torch.stack(embeds)  # [4,8,1024]---[class_num,example_pre_class]
 

@@ -85,15 +85,16 @@ class PTRVerbalizer_New(Verbalizer):
         ]) # [num_masks]
 
         for i in range(self.num_masks):
-            # if i == 0:
-            #     self.verbalizers.append(openprompt.prompts.ProtoVerbalizer.from_config(config=self.proto_verbalizer1,tokenizer=self.tokenizer,model=self.v_model,
-            #                                                                classes=self.sub_labels[i]))
-            # elif i == self.num_masks - 1:
-            #     self.verbalizers.append(
-            #         openprompt.prompts.ProtoVerbalizer.from_config(config=self.proto_verbalizer2,
-            #                                                     tokenizer=self.tokenizer, model=self.v_model,
-            #                                                     classes=self.sub_labels[i]))
-            # else:
+            if i == 0:
+                self.verbalizers.append(openprompt.prompts.ProtoVerbalizer.from_config(config=self.proto_verbalizer1,
+                                                                                       tokenizer=self.tokenizer
+                                                                                       ,model=self.v_model,num_classes=self.num_classes))
+            elif i == self.num_masks - 1:
+                self.verbalizers.append(
+                    openprompt.prompts.ProtoVerbalizer.from_config(config=self.proto_verbalizer2,
+                                                                tokenizer=self.tokenizer,
+                                                                   model=self.v_model,num_classes=self.num_classes))
+            else:
                 self.verbalizers.append(One2oneVerbalizer(tokenizer=self.tokenizer, label_words=self.sub_labels[i], post_log_softmax=False))
 
         self.label_mappings = nn.Parameter(torch.LongTensor([

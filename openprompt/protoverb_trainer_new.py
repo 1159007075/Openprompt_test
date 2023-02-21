@@ -159,8 +159,10 @@ class ProtoVerbClassificationRunner_New(BaseRunner):
                 self.inner_model.verbalizer.train_proto(self.model, self.train_dataloader, self.config.environment.local_rank)
 
         if self.config.train.train_verblizer == "post":
-            self.inner_model.verbalizers[0].train_proto(self.model, self.train_dataloader, self.config.environment.local_rank)
-            self.inner_model.verbalizers[4].train_proto(self.model, self.train_dataloader,
-                                                        self.config.environment.local_rank)
+            ptr_prompts_new_model=self.inner_model.verbalizer
+            ptr_prompts_new_model.verbalizers[0].train_proto(self.model, self.train_dataloader,
+                                                        self.config.environment.local_rank,num_mask=0)
+            ptr_prompts_new_model.verbalizers[ptr_prompts_new_model.num_masks-1].train_proto(self.model, self.train_dataloader,
+                                                        self.config.environment.local_rank,num_mask=ptr_prompts_new_model.num_masks-1)
 
         return self.best_score

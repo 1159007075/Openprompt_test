@@ -90,9 +90,9 @@ def load_verbalizer(config: CfgNode,
     """
     if config.verbalizer is not None:
         verbalizer_class = VERBALIZER_CLASS[config.verbalizer]
-        # verbalizer = verbalizer_class.from_config(config=config[config.verbalizer],proto_verbalizer1=config[config.verbalizer1],
-        #                                 proto_verbalizer2=config[config.verbalizer2],**kwargs)
-        verbalizer = verbalizer_class.from_config(config=config[config.verbalizer],**kwargs)
+        verbalizer = verbalizer_class.from_config(config=config[config.verbalizer],proto_verbalizer1=config[config.verbalizer1],
+                                        proto_verbalizer2=config[config.verbalizer2],**kwargs)
+        # verbalizer = verbalizer_class.from_config(config=config[config.verbalizer],**kwargs)
     return verbalizer
 
 def load_template_generator(config: CfgNode, **kwargs,):

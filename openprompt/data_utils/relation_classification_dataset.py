@@ -10,6 +10,7 @@ from typing import *
 
 from openprompt.utils.logging import logger
 
+import random
 from openprompt.data_utils.utils import InputExample
 from openprompt.data_utils.data_processor import DataProcessor
 
@@ -77,16 +78,17 @@ class TACREDProcessor(DataProcessor):
         with open(path, encoding='utf8') as f:
             example_jsons = json.load(f)
             for example_json in example_jsons:
+                if random.random()>0.6:
                 # guid = example_json["id"]
-                label = self.get_label_id(example_json["label"])
-                text_a=example_json["text"]
-                meta = {
-                    "head": example_json["ents"][0][0],
-                    "tail": example_json["ents"][1][0],
-                }
+                    label = self.get_label_id(example_json["label"])
+                    text_a=example_json["text"]
+                    meta = {
+                        "head": example_json["ents"][0][0],
+                        "tail": example_json["ents"][1][0],
+                    }
 
-                example = InputExample(text_a=text_a, meta=meta, label=label)
-                examples.append(example)
+                    example = InputExample(text_a=text_a, meta=meta, label=label)
+                    examples.append(example)
         return examples
 
 class TACREVProcessor(TACREDProcessor):
