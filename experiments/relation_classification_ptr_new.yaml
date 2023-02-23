@@ -23,10 +23,11 @@ dataloader:
 
 train:
   batch_size: 4
-  num_epochs: 1
+  num_epochs: 3
   gradient_accumulation_steps: 1
   max_grad_norm: 1.0
-  train_verblizer: post
+  train_verblizer: post    # alternate
+
 
 test:
   batch_size: 8
@@ -70,9 +71,9 @@ few_shot:
 
 sampling_from_train:
   parent_config: few_shot_sampling
-  num_examples_per_label: 2
+  num_examples_per_label: 16
   also_sample_dev: True
-  num_examples_per_label_dev: 2
+  num_examples_per_label_dev: 16
   seed:
     - 123
 

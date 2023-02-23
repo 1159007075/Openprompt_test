@@ -4,7 +4,7 @@ dataset:
 
 plm:
   model_name: roberta
-  model_path: roberta-large
+  model_path: roberta-base
   optimize:
     name: AdamW
     freeze_para: False
@@ -23,7 +23,7 @@ dataloader:
 
 train:
   batch_size: 4
-  num_epochs: 4
+  num_epochs: 30
   gradient_accumulation_steps: 1
   max_grad_norm: 1.0
   train_verblizer: post
@@ -55,8 +55,8 @@ ptr_verbalizer:
 environment:
   num_gpus: 2
   cuda_visible_devices:
-    - 2
-    - 3
+    - 0
+    - 1
   local_rank: 0 
 
 classification:

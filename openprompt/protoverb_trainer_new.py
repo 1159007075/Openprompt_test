@@ -132,7 +132,12 @@ class ProtoVerbClassificationRunner_New(BaseRunner):
     def on_fit_start(self):
         """Some initialization works"""
         if self.config.train.train_verblizer != "post":
-            self.inner_model.verbalizer.train_proto(self.model, self.train_dataloader, self.config.environment.local_rank)
+            ptr_prompts_new_model = self.inner_model.verbalizer
+            ptr_prompts_new_model.verbalizers[0].train_proto(self.model, self.train_dataloader,
+                                                             self.config.environment.local_rank)
+            ptr_prompts_new_model.verbalizers[ptr_prompts_new_model.num_masks - 1].train_proto(self.model,
+                                                                                               self.train_dataloader,
+                                                                                               self.config.environment.local_rank)
 
     def fit(self, ckpt: Optional[str] = None):
         self.set_stop_criterion()
@@ -156,7 +161,12 @@ class ProtoVerbClassificationRunner_New(BaseRunner):
                 logger.info("Stop training by reaching maximum num_training_steps")
                 break
             if self.config.train.train_verblizer == "alternate":
-                self.inner_model.verbalizer.train_proto(self.model, self.train_dataloader, self.config.environment.local_rank)
+                ptr_prompts_new_model = self.inner_model.verbalizer
+                ptr_prompts_new_model.verbalizers[0].train_proto(self.model, self.train_dataloader,
+                                                                 self.config.environment.local_rank)
+                ptr_prompts_new_model.verbalizers[ptr_prompts_new_model.num_masks - 1].train_proto(self.model,
+                                                                                                   self.train_dataloader,
+                                                                                                   self.config.environment.local_rank)
 
         if self.config.train.train_verblizer == "post":
             ptr_prompts_new_model=self.inner_model.verbalizer

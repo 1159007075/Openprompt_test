@@ -84,9 +84,14 @@ class PTRVerbalizer_New(Verbalizer):
             if i == 0:
                 self.verbalizers.append(ProtoVerbalizer_New(tokenizer=self.tokenizer,model=self.v_model,num_classes=self.num_classes,
                                                         num_mask=0))
+                label_words = ["entity" for _ in range(self.num_classes)]
+                self.verbalizers[i].label_words = label_words
+
             elif i == self.num_masks - 1:
                 self.verbalizers.append(ProtoVerbalizer_New(tokenizer=self.tokenizer,model=self.v_model,num_classes=self.num_classes,
                                                         num_mask=self.num_masks-1))
+                label_words = ["thing" for _ in range(self.num_classes)]
+                self.verbalizers[i].label_words = label_words
             else:
                 self.verbalizers.append(One2oneVerbalizer(tokenizer=self.tokenizer, label_words=self.sub_labels[i], post_log_softmax=False))
 

@@ -15,7 +15,7 @@ import torch.nn.functional as F
 from openprompt.utils.logging import logger
 import copy
 from transformers.modeling_outputs import CausalLMOutputWithCrossAttentions, Seq2SeqLMOutput, MaskedLMOutput
-
+from torch.nn.utils.rnn import pad_sequence
 from transformers.models.t5 import  T5ForConditionalGeneration
 
 class ProtoVerbalizer_New(Verbalizer):
@@ -45,7 +45,7 @@ class ProtoVerbalizer_New(Verbalizer):
                  post_log_softmax: Optional[bool] = True,
                  lr: Optional[float] = 0.01,#1e-3
                  mid_dim: Optional[int] = 64,
-                 epochs: Optional[int] = 50,
+                 epochs: Optional[int] = 30,
                  multi_verb: Optional[str] = "proto",
                  num_mask: Optional[int] = 0,
                 ):
@@ -167,7 +167,7 @@ class ProtoVerbalizer_New(Verbalizer):
         label_words_logits = logits[:, self.label_words_ids]    # 2,50265 logits：（``batch_size`'，``num_mask_token`，`` vocb_size ``） label_words_id:label token
         label_words_logits = self.handle_multi_token(label_words_logits, self.words_ids_mask) # 2,4,1,1
         temp=10000*(1-self.label_words_mask) # output:()
-        label_words_logits -= temp # 2,42,1,12
+        label_words_logits -= temp
         return label_words_logits
 
     def process_logits(self, logits: torch.Tensor, **kwargs):
@@ -342,9 +342,12 @@ class ProtoVerbalizer_New(Verbalizer):
                 outputs_at_mask = model.module.extract_at_mask(hidden, batch)
                 for j in range(len(outputs_at_mask)):
                     label = batch['label'][j]
-                    embeds[label].append(outputs_at_mask[j][0])
-        embeds = [torch.stack(e) for e in embeds]
-        embeds = torch.stack(embeds)  # [4,8,1024]---[class_num,example_pre_class]
+                    embeds[label].append(outputs_at_mask[j][self.num_mask])
+        # 合并
+        for i,e in enumerate(embeds):
+            e=torch.stack(e)
+            embeds[i]=e
+        embeds = pad_sequence(embeds)# [4,8,1024]---[class_num,example_pre_class]
 
         instance_mean = embeds.mean(1)  # [4,1024]平均
         loss = 0.
