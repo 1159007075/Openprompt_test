@@ -6,13 +6,13 @@ import torch
 from openprompt.data_utils.utils import InputExample
 
 dataset = {}
-dataset['train'] = AgnewsProcessor().get_train_examples("./datasets/TextClassification/agnews")
-dataset['test'] = AgnewsProcessor().get_test_examples("./datasets/TextClassification/agnews")
+dataset['train'] = AgnewsProcessor().get_train_examples("../datasets/TextClassification/agnews")
+dataset['test'] = AgnewsProcessor().get_test_examples("../datasets/TextClassification/agnews")
 from openprompt.plms import load_plm
-plm, tokenizer, model_config, WrapperClass = load_plm("roberta", "../../plm_cache/roberta-large")
+plm, tokenizer, model_config, WrapperClass = load_plm("roberta", "roberta-base")
 
 from openprompt.prompts import ManualTemplate
-mytemplate = ManualTemplate(tokenizer=tokenizer).from_file("scripts/TextClassification/agnews/manual_template.txt", choice=0)
+mytemplate = ManualTemplate(tokenizer=tokenizer).from_file("../scripts/TextClassification/agnews/manual_template.txt", choice=0)
 
 from openprompt import PromptDataLoader
 
@@ -21,7 +21,7 @@ from openprompt import PromptDataLoader
 # ## Define the verbalizer
 from openprompt.prompts import ManualVerbalizer, KnowledgeableVerbalizer
 
-myverbalizer = KnowledgeableVerbalizer(tokenizer, num_classes=4).from_file("scripts/TextClassification/agnews/knowledgeable_verbalizer.txt")
+myverbalizer = KnowledgeableVerbalizer(tokenizer, num_classes=4).from_file("../scripts/TextClassification/agnews/knowledgeable_verbalizer.txt")
 # or
 # myverbalizer = ManualVerbalizer(tokenizer, num_classes=4).from_file("scripts/TextClassification/agnews/manual_verbalizer.txt")
 
@@ -46,17 +46,17 @@ from openprompt import PromptForClassification
 use_cuda = True
 prompt_model = PromptForClassification(plm=plm,template=mytemplate, verbalizer=myverbalizer, freeze_plm=False)
 if use_cuda:
-    prompt_model=  prompt_model.cuda()
+    prompt_model=  prompt_model.cuda(3)
 
 org_label_words_num = [len(prompt_model.verbalizer.label_words[i]) for i in range(4)]
 from openprompt.utils.calibrate import calibrate
 # calculate the calibration logits
-cc_logits = calibrate(prompt_model, support_dataloader)
-print("the calibration logits is", cc_logits)
+# cc_logits = calibrate(prompt_model, support_dataloader)
+# print("the calibration logits is", cc_logits)
 
 # register the logits to the verbalizer so that the verbalizer will divide the calibration probability in producing label logits
 # currently, only ManualVerbalizer and KnowledgeableVerbalizer support calibration.
-prompt_model.verbalizer.register_calibrate_logits(cc_logits)
+# prompt_model.verbalizer.register_calibrate_logits(cc_logits)
 new_label_words_num = [len(prompt_model.verbalizer.label_words[i]) for i in range(4)]
 print("Original number of label words per class: {} \n After filtering, number of label words per class: {}".format(org_label_words_num, new_label_words_num))
 

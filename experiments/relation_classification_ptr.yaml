@@ -53,16 +53,17 @@ ptr_verbalizer:
   file_path: ../scripts/RelationClassification/TACRED/ptr_verbalizer.jsonl
   
 environment:
-  num_gpus: 2
+  num_gpus: 3
   cuda_visible_devices:
-    - 0
     - 1
+    - 2
+    - 3
   local_rank: 0 
 
 classification:
   loss_function: nll_loss
 
-learning_setting: few_shot
+learning_setting: full
 
 few_shot:
   parent_config: learning_setting

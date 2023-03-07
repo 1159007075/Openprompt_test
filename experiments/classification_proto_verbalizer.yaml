@@ -45,9 +45,10 @@ proto_verbalizer:
   
 
 environment:
-  num_gpus: 1
+  num_gpus: 2
   cuda_visible_devices:
     - 0
+    - 1
   local_rank: 0
   
 learning_setting: few_shot

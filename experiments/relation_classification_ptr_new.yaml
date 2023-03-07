@@ -56,8 +56,8 @@ ptr_verbalizer_new:
 environment:
   num_gpus: 2
   cuda_visible_devices:
-    - 0
-    - 1
+    - 2
+    - 3
   local_rank: 0
 
 classification:
@@ -71,9 +71,9 @@ few_shot:
 
 sampling_from_train:
   parent_config: few_shot_sampling
-  num_examples_per_label: 16
+  num_examples_per_label: 8
   also_sample_dev: True
-  num_examples_per_label_dev: 16
+  num_examples_per_label_dev: 8
   seed:
     - 123
 
